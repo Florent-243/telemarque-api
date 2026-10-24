@@ -1,13 +1,13 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import json
 import os
 
 app = Flask(__name__)
+CORS(app) # Autorise les connexions externes (depuis Netlify)
 
-# Fichier JSON pour stocker les configurations en ligne sur Render
 CONFIG_FILE = "config_boutique.json"
 
-# Données par défaut si le fichier n'existe pas encore
 def charger_donnees():
     if os.path.exists(CONFIG_FILE):
         try:
@@ -33,19 +33,15 @@ def sauvegarder_donnees(data):
 @app.route("/api/config", methods=["GET", "POST"])
 def config_route():
     if request.method == "GET":
-        # Renvoie toute la configuration au site web ou à ton application PC
         data = charger_donnees()
         return jsonify(data), 200
 
     elif request.method == "POST":
-        # Reçoit les modifications envoyées depuis le site Netlify et les enregistre
         contenu = request.json
         if not contenu:
             return jsonify({"erreur": "Aucune donnée reçue"}), 400
 
         data = charger_donnees()
-
-        # Met à jour l'ensemble des clés reçues
         for cle in data.keys():
             if cle in contenu:
                 data[cle] = str(contenu[cle])
