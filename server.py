@@ -1,21 +1,20 @@
+import os
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Exemple de données partagées (en attendant une vraie base de données en ligne)
+# Exemple de données partagées
 parametres_boutique = {
     "nom_boutique": "TELEMARQUE STORE",
     "taux_change": "2800.0",
 }
 
 
-# Route pour que ton site Netlify ou ton application lise les données
 @app.route("/api/config", methods=["GET"])
 def get_config():
   return jsonify(parametres_boutique)
 
 
-# Route pour modifier les paramètres depuis le web (Netlify)
 @app.route("/api/config", methods=["POST"])
 def update_config():
   data = request.json
@@ -27,4 +26,7 @@ def update_config():
 
 
 if __name__ == "__main__":
-  app.run(debug=True)
+  # Récupère le port attribué automatiquement par Render (par défaut 5000 en local)
+  port = int(os.environ.get("PORT", 5000))
+  # Écoute sur 0.0.0.0 pour que Render puisse y accéder
+  app.run(host="0.0.0.0", port=port)
